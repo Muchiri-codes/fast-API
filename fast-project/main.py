@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Path
 from typing import Annotated
 
 # from enum import Enum
@@ -122,7 +122,6 @@ async def get_animals(q:Annotated[list[str] | None, Query(
 from pydantic import AfterValidator
 import random
 
-
 data = {
     "isbn-9781529046137": "The Hitchhiker's Guide to the Galaxy",
     "imdb-tt0371724": "The Hitchhiker's Guide to the Galaxy",
@@ -141,3 +140,30 @@ async def read_id(id:Annotated[str | None, AfterValidator(check_valid_id)]= None
   else:
     id, item = random.choice(list(data.items()))
   return {"id":id, "name": item}
+
+
+@app.get("/car/{car_id}")
+async def get_car(car_id:Annotated [int, Path(title="The car id to get")], q:Annotated[str | None, Query(alias="car-id", deprecated=True)] = None):
+  results = {"car_id":car_id}
+  if q:
+    results.update({"q": q})
+    
+  return results 
+
+
+#Number validations
+#ge - greater than or equal
+#gt - greater than
+# lt - less that
+# le - less tha or equal to
+
+
+
+@app.get("/cow/{cow_id}")
+
+async def get_cow(cow_id:Annotated[int, Path(title="where to get the cows", gt=0, le=1000)], q:str |None):
+  results = {"cow_id": cow_id}
+  if q:
+    results.update({"q":q})
+  return results
+  
