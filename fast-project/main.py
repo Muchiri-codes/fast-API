@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Query, Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 # from enum import Enum
-from  pydantic import BaseModel
+from  pydantic import BaseModel,Field
 
 ##REQUEST BOdy data sent by the client to the API : A response body is the data your API sends to the client.
 
@@ -167,3 +167,37 @@ async def get_cow(cow_id:Annotated[int, Path(title="where to get the cows", gt=0
     results.update({"q":q})
   return results
   
+  
+  
+  #GROUPING RELATED PARAMETERS - MODELS
+  # below is a pydantic model, its reusable shape that describes what filter options are allowed
+class FilterParams(BaseModel):
+  model_config = {"extra": "forbid"} #prohibits extra fields
+  limit: int=Field(100, gt=0, le=100)
+  offset: int = Field(0, ge=0)
+  order_by:Literal["created_at", "updated_at"] = "created_at" 
+  tags:list[str] =[]
+  
+@app.get("/goats/")
+async def get_goats(filter_query: Annotated[FilterParams, Query()]):
+  return filter_query
+
+
+#COMBINING PARAMETER MODEL
+
+#parameter model A
+class Pagination(BaseModel):
+  off_by:int = Field(0, ge=0)
+  more: int = Field(10, ge=1)
+  
+#parameter model B
+class Filters(BaseModel):
+  tags:list[str] = []
+  
+@app.get("/camel/")
+async def get_camel(
+  pagination: Annotated[Pagination, Query()],
+  filters:Annotated[Filters | None, Query(alias="filter")] = None,
+  search: int | None = None
+):
+  return {"pagination": pagination, "filters": filters, "search": search}
