@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Path
+from fastapi import FastAPI, Query, Path, Body
 from typing import Annotated, Literal
 
 # from enum import Enum
@@ -201,3 +201,20 @@ async def get_camel(
   search: int | None = None
 ):
   return {"pagination": pagination, "filters": filters, "search": search}
+
+#BODY FIELDS
+class Item(BaseModel):
+  #BaseModel i used to validate json request body
+  name:str
+  #Field works the same way as Query, Path and Body, it has all the same parameters
+  description: str | None = Field(
+    default = None, title="Item description", max_length=300
+  )
+  price : float = Field(gt=0, description="Price must be greater than zero")
+  tax: float | None
+  
+  
+@app.put("/items/{item_id}")
+async def add_item(item_id: int , item:Annotated[Item, Body(embed=True)]):
+  result = {"item_id": item_id, "item": item}
+  return result
