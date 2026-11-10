@@ -203,8 +203,13 @@ async def get_camel(
   return {"pagination": pagination, "filters": filters, "search": search}
 
 #BODY FIELDS
+
+class Image(BaseModel):
+  url:str
+  name:str
+  
 class Item(BaseModel):
-  #BaseModel i used to validate json request body
+  #BaseModel- used to validate json request body
   name:str
   #Field works the same way as Query, Path and Body, it has all the same parameters
   description: str | None = Field(
@@ -212,9 +217,12 @@ class Item(BaseModel):
   )
   price : float = Field(gt=0, description="Price must be greater than zero")
   tax: float | None
-  
+  tag:set[str] =set() #set contains unique items
+  image:Image | None = None #Nested model
   
 @app.put("/items/{item_id}")
 async def add_item(item_id: int , item:Annotated[Item, Body(embed=True)]):
   result = {"item_id": item_id, "item": item}
   return result
+
+
