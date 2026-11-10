@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query, Path, Body
 from typing import Annotated, Literal
 
 # from enum import Enum
-from  pydantic import BaseModel,Field
+from  pydantic import BaseModel,Field, HttpUrl
 
 ##REQUEST BOdy data sent by the client to the API : A response body is the data your API sends to the client.
 
@@ -205,7 +205,7 @@ async def get_camel(
 #BODY FIELDS
 
 class Image(BaseModel):
-  url:str
+  url:HttpUrl
   name:str
   
 class Item(BaseModel):
@@ -218,7 +218,20 @@ class Item(BaseModel):
   price : float = Field(gt=0, description="Price must be greater than zero")
   tax: float | None
   tag:set[str] =set() #set contains unique items
-  image:Image | None = None #Nested model
+  images:list[Image] | None = None #list of Nested submodel
+  
+  
+  #Deeply nested
+class Offer(BaseModel):
+  name : str
+  description: str |  None  = None
+  price: float
+  items: list[Item]
+  
+  
+@app.gpost("/offers/")
+async def get_offer(offer:Offer):
+  return offer
   
 @app.put("/items/{item_id}")
 async def add_item(item_id: int , item:Annotated[Item, Body(embed=True)]):
