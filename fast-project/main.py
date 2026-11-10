@@ -229,7 +229,7 @@ class Offer(BaseModel):
   items: list[Item]
   
   
-@app.gpost("/offers/")
+@app.post("/offers/")
 async def get_offer(offer:Offer):
   return offer
   
@@ -239,3 +239,14 @@ async def add_item(item_id: int , item:Annotated[Item, Body(embed=True)]):
   return result
 
 
+#BODIES OF PURE LISTS
+# -- declared directly in the functiion parameters
+class Images(BaseModel):
+  name: str
+  url: HttpUrl
+  
+@app.post("/images/multiple/")
+async def create_multiple_images(images: list[Image]):
+  for image in images:
+    image.url
+  return image
