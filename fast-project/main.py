@@ -303,3 +303,30 @@ async def get_people(person_id: int, person:Annotated[Person, Body(
 )]):
   results = {'person_id': person_id, "person": Person}
   return results
+
+
+
+# EXTRA DATA TYPES
+from uuid import UUID
+from datetime import datetime, timedelta, time
+@app.put("dogs/{dog_id}")
+async def add_dog(
+  dog_id: UUID,
+  start_datetime : Annotated[datetime, Body()],
+  end_datetime : Annotated[datetime, Body()],
+  process_after : Annotated[timedelta, Body()],
+  repeat_at :Annotated[time | None, Body()] = None
+):
+  
+  start_process = start_datetime +  process_after
+  duration = end_datetime - start_datetime
+  
+  return{
+    "dog_id": dog_id,
+    "start time and date": start_datetime,
+    "end time and date": end_datetime,
+    "processed after": process_after,
+    "repeated at": repeat_at,
+    "start_process": start_process,
+    "duration":  duration
+  }
