@@ -2,7 +2,7 @@
 name = "fast-project"
 version = "0.1.0"
 [tool.fastapi]
-entrypoint = "main:app"
+entrypoint = "cont-body-fields:app"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.162.0",
