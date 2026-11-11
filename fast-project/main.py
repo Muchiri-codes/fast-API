@@ -250,3 +250,56 @@ async def create_multiple_images(images: list[Image]):
   for image in images:
     image.url
   return image
+
+class Stuff(BaseModel):
+  name: str = Field(examples=["Foo"])
+  description: str | None =Field(default=None, examples = ["A very simple stuff"])
+  price : float = Field(examples=[34.6])
+  tax: float | None =Field(default = None, examples=[3.5])
+  #model config is added into the "field"
+  # model_config={
+  #   "examples":[
+  #     {
+  #       "name": "Nice stuff",
+  #       "description":"Just a normal stuff",
+  #       "price": 65.87,
+  #       "tax":4.56
+  #     }
+  #   ]
+  # }
+  
+@app.put("/Stuff/{stuff_id}")
+async def get_Stuff(stuff_id: int, item:Item):
+  results = {"item_id": stuff_id, "item": Stuff}
+  return results
+
+
+
+class Person(BaseModel):
+  age:int
+  name: str
+  location: str
+  gender : str = "male"
+  
+  
+@app.put("/people/{person_id}")
+async def get_people(person_id: int, person:Annotated[Person, Body(
+  examples=[
+    {
+                    "name": "Foo",
+                    "description": "A very nice Item",
+                    "price": 35.4,
+                    "tax": 3.2,
+                },
+                {
+                    "name": "Bar",
+                    "price": "35.4",
+                },
+                {
+                    "name": "Baz",
+                    "price": "thirty five point four",
+                },
+  ]
+)]):
+  results = {'person_id': person_id, "person": Person}
+  return results
