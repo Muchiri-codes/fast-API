@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Body, Cookie, Header
-from typing import Annotated
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, Body, Cookie, Header, Response
+from typing import Annotated, Any
+from pydantic import BaseModel, Field, EmailStr
+from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
@@ -38,5 +39,45 @@ async def get_preferences(
   return {"preference_cookies": preferences, "headers": headers}
 
 
+#RETURN TYPE - Response model
+class Item(BaseModel):
+  name: str
+  description: str | None = None
+  price : float
+  tax: float | None= None
+  tags: list[str] = []
+  
+  
+@app.post("/item/", response_model=Item)
+async def add_items(item: Item) -> Any:
+  return item
 
-#HEADER PARAMS MODELS
+@app.get("/item", response_model=list[Item])
+async def read_items() -> Any:
+  return[
+    Item(name="water gun", price=456.78),
+    Item(name="Plumbus",price = 556.78)
+  ]
+  
+class BaseUser(BaseModel):
+  username:str
+  email: EmailStr
+  full_name: str | None = None
+  
+  
+class UserIn(BaseModel):
+  #user only input the password, all other fields will be validated from the server database
+  password: str
+  
+@app.post("/user/")
+async def login(user: UserIn) -> BaseUser:
+  return user
+
+#setting the response_model to none makes fastapi to skip response model generation
+@app.get("/teleport", response_model=None)
+async def get_port(portal: bool= False) -> Response | dict:
+  if portal:
+   return RedirectResponse(url="https://johnmuchiri.vercel.app")
+  return {"message":"Here is my portal"}
+
+#response_model_exclude_unset = True/False - to remove defaulted values
