@@ -5,7 +5,7 @@ dependencies = [
     "email-validator>=2.3.0",
 ]
 [tool.fastapi]
-entrypoint = "cont-body-fields:app"
+entrypoint = "cont1:app"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.162.0",
