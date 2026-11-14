@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from pydantic import BaseModel, EmailStr
 app = FastAPI()
 
@@ -46,8 +46,21 @@ items = [
 ]
 
 #responses can also be a list of objects
-@app.get("/items/", response_model=list[Item])
+@app.post("/items/", response_model=list[Item], status_code = status.HTTP_201_CREATED)
 async def read_items():
     return items
   
-  
+# Status codes 
+# 100 - 199 - information, rarely used, they dont have a body
+# 200 - 299 - success
+# 200 - Ok 
+# 201 - created eg. a record was created successfully in the DB
+# 204 - No ConnectionResetError
+
+# 300 - 399 - Redirection
+# 304 - Not modified
+
+# 400 - 499 Client error 
+# 400 - geeneric usage for any client error
+
+# 500 - 599 - server errors - almost never used
