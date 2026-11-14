@@ -1,6 +1,8 @@
-from fastapi import FastAPI, status, Form
+from fastapi import FastAPI, status, Form, File, UploadFile
 from typing import Annotated,Literal
 from pydantic import BaseModel, EmailStr
+from fastapi.responses import HTMLResponse
+
 app = FastAPI()
 
 #Userbase class will be used in all the other models
@@ -115,3 +117,48 @@ async def create_profile(
   contact: Annotated[ Profile | Company | None, Form(discriminator="kind")] = None
 ):
   return contact
+
+#Request files - define files to be uploaded by the client
+# adding a None and initialzing it as None makes the file optional
+# extra metadata can be added inside the File()
+@app.post("/files/")
+async def create_file(file: Annotated[bytes | None, File(description="A file read as bytes")]= None):
+  if not file:
+    return{"message": "No file sent!"}
+  else:
+    return {"file_size": len(file)}
+
+@app.post("/uploadfile/")
+#UploadFile has advatages over bytes, no File()
+async def create_upload_file(file: Annotated[UploadFile | None, File(description="A file read as an upload")]= None):
+  if not file:
+    return {"message":"You did not upload any file"}
+  else:
+    return {"filename": file.filename}
+  
+
+#Adding multiple images - ue list
+@app.post("/images/")
+async def add_images(files:Annotated[list[bytes], File()]):
+  return {"file sizes":[len(file) for file in files]}
+
+@app.post("/uploadimages/")
+async def create_image_upload(files: list[UploadFile]):
+  return {"filenames": [file.filename  for file in files]}
+
+
+@app.get("/")
+async def main():
+  content = """
+<body>
+<form action="/files/" enctype="multipart/form-data" method="post">
+<input name="files" type="file" multiple>
+<input type="submit">
+</form>
+<form action="/uploadfiles/" enctype="multipart/form-data" method="post">
+<input name="files" type="file" multiple>
+<input type="submit">
+</form>
+</body>
+    """
+  return HTMLResponse(content=content)

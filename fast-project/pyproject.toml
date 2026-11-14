@@ -3,7 +3,6 @@ name = "fast-project"
 version = "0.1.0"
 dependencies = [
     "email-validator>=2.3.0",
-    "python-multipart>=0.0.33",
 ]
 [tool.fastapi]
 entrypoint = "cont1:app"
