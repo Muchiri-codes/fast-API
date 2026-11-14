@@ -1,4 +1,5 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Form
+from typing import Annotated
 from pydantic import BaseModel, EmailStr
 app = FastAPI()
 
@@ -64,3 +65,16 @@ async def read_items():
 # 400 - geeneric usage for any client error
 
 # 500 - 599 - server errors - almost never used
+
+
+#RECEIVING FORM DATA
+@app.post("/login")
+async def login_user(username: Annotated[str, Form()] ,password:Annotated[str, Form()]):
+  
+  return{"username": username}
+
+
+#bool with a false default makes you receive false when a checkbox was left unchecked since it is usually ommitted by browsers
+@app.post("/preferences")
+async def set_preferences(sunscribe: Annotated[bool, Form()] = False):
+  return{"subscribe": sunscribe}
