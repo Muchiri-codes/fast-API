@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status, Form
-from typing import Annotated
+from typing import Annotated,Literal
 from pydantic import BaseModel, EmailStr
 app = FastAPI()
 
@@ -78,3 +78,40 @@ async def login_user(username: Annotated[str, Form()] ,password:Annotated[str, F
 @app.post("/preferences")
 async def set_preferences(sunscribe: Annotated[bool, Form()] = False):
   return{"subscribe": sunscribe}
+
+
+#===============FORM MODELS====================
+#To use forms, first install python-multipart
+#pydantic model for forms
+
+class FormData(BaseModel):
+  username: str
+  password: str
+  # model_config={"extra":"forbid"} - will reject any field outside this 
+  
+class Specific(BaseModel):
+  tags:list[str]  =[]
+  
+@app.post("/add")
+async def add_login(
+  data: Annotated[FormData, Form()],
+  token: Annotated[str , Form()],
+  preferences:Annotated[Specific, Form()]):
+  return {"data": data, "preferences": preferences, "token": token}
+
+
+
+class Profile(BaseModel):
+  name: str
+  kind: Literal["person"]
+  
+class Company(BaseModel):
+  kind: Literal["company"]
+  company_name: str
+  
+@app.post("/profiles/")
+async def create_profile(
+  #discriminator decides what moldel to uild response for
+  contact: Annotated[ Profile | Company | None, Form(discriminator="kind")] = None
+):
+  return contact
