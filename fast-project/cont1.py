@@ -143,7 +143,7 @@ async def add_images(files:Annotated[list[bytes], File()]):
   return {"file sizes":[len(file) for file in files]}
 
 @app.post("/uploadimages/")
-async def create_image_upload(files: list[UploadFile]):
+async def create_image_upload(files: Annotated[list[UploadFile], File(description="file ploads with additional metadata")]):
   return {"filenames": [file.filename  for file in files]}
 
 
@@ -162,3 +162,15 @@ async def main():
 </body>
     """
   return HTMLResponse(content=content)
+
+@app.post("/addfile")
+async def add_file(
+  file: Annotated[bytes, File()],
+  token: Annotated[str, Form()],
+  fileb:Annotated[UploadFile, File()],
+):
+  return {
+    "file size": len(file),
+    "token": token,
+    "file b content type": fileb.content_type
+  }
