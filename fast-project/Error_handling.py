@@ -124,3 +124,20 @@ async def create_good(good: Goods) -> Goods:
   """
   
   return good
+
+#converting a data type to one compatible with json like a dict/list
+from fastapi.encoders import jsonable_encoder
+from datetime import datetime
+
+fake_db  ={}
+
+class Tools(BaseModel):
+  title: str
+  timestamp: datetime
+  description: str | None = None
+  
+@app.put("/items/{id}")
+def update_item(id: str, item: Tools) -> Tools:
+  json_compatible_data= jsonable_encoder(item) #will convert item data to json data - Pydantic model to a dict, and the datetime to a str
+  fake_db[id]=json_compatible_data
+  
