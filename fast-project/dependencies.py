@@ -1,6 +1,6 @@
 # DEPENDENCY INJECTION
 #A way for your code (in this case, your path operation functions) to declare things that it requires to work and use: "dependencies". - minimize code repetition
-from fastapi import FastAPI, Depends, Cookie
+from fastapi import FastAPI, Depends, Cookie, Header, HTTPException
 from typing import Annotated
 
 app = FastAPI()
@@ -67,3 +67,20 @@ async def read_query(
   return {
     "q_or_cookie": query_or_default
   }
+  
+# Dependencies that dont return a value or the return value isnt needed but still want to execute the dependency
+#For those cases, instead of declaring a path operation function parameter with Depends, you can add a list of dependencies to the path operation decorator.
+def x_token_verify(x_token: Annotated[str, Header()]):
+  if x_token !="super_x_value":
+    raise HTTPException(status_code=400, detail ='Wrong value for the x_token')
+
+async def x_key_verify(x_key: Annotated[str,Header()]):
+  if x_key != "some-super-key":
+    raise HTTPException(status_code = 400, detail="Wrong x_key")
+  return x_key
+
+@app.get("/verify/", dependencies=[Depends(x_token_verify), Depends(x_key_verify)])
+async def verify_token_key():
+  return [{"item":"foo"}, {"item":"bull"}]
+  
+
