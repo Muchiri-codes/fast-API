@@ -79,8 +79,25 @@ async def x_key_verify(x_key: Annotated[str,Header()]):
     raise HTTPException(status_code = 400, detail="Wrong x_key")
   return x_key
 
+
+# to define global dependencies in fastApi
+# app = FastAPI(dependencies=[Depends(verify_token), Depends(verify_key)])
 @app.get("/verify/", dependencies=[Depends(x_token_verify), Depends(x_key_verify)])
 async def verify_token_key():
   return [{"item":"foo"}, {"item":"bull"}]
   
+  
+#DEPENDENCIES WITH YIELD
+# if the dependeny can do extra steps after finishing, use yield instead of return
 
+#yield turns the dependency into a two-part function: the first half runs before your route, the second half runs after — and FastAPI is the thing that "unpauses" it
+
+def get_db():
+  print("A: Opening session")
+  db = sessionLoacal()
+  try:
+    print ("B: Handing DB to Route")
+    yield db
+  finally:
+    print("C: closing session")
+    db.close()
