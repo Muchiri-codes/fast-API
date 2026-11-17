@@ -30,6 +30,7 @@ async def update_item(item_id: str, item: Item) -> Item:
   return updated_item
 
 
-#partial updates with patch - rarely used, put is usually used
+
+
 
 
