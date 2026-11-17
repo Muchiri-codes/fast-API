@@ -1,6 +1,6 @@
 # DEPENDENCY INJECTION
 #A way for your code (in this case, your path operation functions) to declare things that it requires to work and use: "dependencies". - minimize code repetition
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Cookie
 from typing import Annotated
 
 app = FastAPI()
@@ -43,3 +43,27 @@ async def read_item(commons: Annotated[CommonQueryParams, Depends()]):
     items = fake_items_db[commons.skip : commons.skip + commons.limit]
     response.update({"items": items})
     return response
+  
+  
+  
+  #SUBDEPENDENCIES
+  #1st dependency
+def query_extractor(q: str | None = None):
+  return q
+# 2nd dependable/dependant
+def query_cookie_extractor(
+  q: Annotated[str, Depends(query_extractor)],
+  last_query: Annotated[str | None, Cookie()] = None
+):
+  if not q:
+    return last_query
+  return q
+
+#we now use the dependency
+@app.get("/cows")
+async def read_query(
+  query_or_default: Annotated[str, Depends(query_cookie_extractor)],
+):
+  return {
+    "q_or_cookie": query_or_default
+  }
