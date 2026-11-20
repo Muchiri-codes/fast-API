@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Query
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from typing import Annotated
 from contextlib import asynccontextmanager
+from fastapi.exceptions import HTTPException
 
 class Hero(SQLModel, table = True):
   id: int |None = Field(default=None, primary_key= True)
@@ -24,7 +25,7 @@ def get_session():
   with Session(engine) as session: #open a session
     yield session
     
-sessionDep = Annotated[Session, Depends(get_session)]
+SessionDep = Annotated[Session, Depends(get_session)]
     
      
 @asynccontextmanager
@@ -35,7 +36,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 @app.post("/heroes/") # create a row
-def create_hero(hero: Hero, session: sessionDep) -> Hero:
+def create_hero(hero: Hero, session: SessionDep) -> Hero:
   session.add(hero) #stage it
   session.commit() #save to db
   session.refresh(hero) # reload from db
@@ -45,10 +46,30 @@ def create_hero(hero: Hero, session: sessionDep) -> Hero:
 #read the heroes
 @app.get("/heroes/")
 def read_heroes(
-  session: sessionDep,
+  session: SessionDep,
   offset:int=0,
   limit: Annotated[int, Query(le=100)] = 100,  #prevent requesting too many rows 
   
 ) -> list[Hero]:
   heroes = session.exec(select(Hero).offset(offset).limit(limit)).all()
   return heroes
+
+
+@app.get("/heroes/{hero_id}")
+def read_hero(hero_id: int, session: SessionDep) -> Hero:
+  hero = session.get(Hero, hero_id)
+  if not hero:
+    raise HTTPException(status_code=404, detail="Hero Not Found!")
+  return hero
+
+
+@app.delete("/heroes/{hero_id}")
+def delete_hero(hero_id: int ,session:SessionDep):
+  hero = session.get(Hero, hero_id)
+  if not hero:
+    raise HTTPException(
+      status_code = 404, detail="Hero not found"
+    )
+  session.delete(hero)
+  session.commit()
+  return {"ok": True}
