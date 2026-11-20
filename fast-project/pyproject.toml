@@ -5,6 +5,7 @@ dependencies = [
     "email-validator>=2.3.0",
     "pwdlib[argon2]>=0.4.2",
     "pyjwt>=2.15.1",
+    "sqlmodel>=0.0.50",
 ]
 [tool.fastapi]
 entrypoint = "Relational_dbs:app"
