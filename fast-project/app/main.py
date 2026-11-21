@@ -1,12 +1,9 @@
 #global dependencies could also be declared
 
-
-
 from fastapi import Depends, FastAPI
 from .dependencies import get_token_header, get_query_token
 from .internal import admin
-from .routers import items, users
-from .cont_learn import items
+from .routers import items, users, cont_learn
 
 
 app = FastAPI(dependencies=[Depends(get_query_token)])
@@ -14,7 +11,7 @@ app = FastAPI(dependencies=[Depends(get_query_token)])
 
 app.include_router(users.router)
 app.include_router(items.router)
-app.include_router(items.router)
+app.include_router(cont_learn.router)
 app.include_router(
   admin.router,
   prefix="/admin",
@@ -26,3 +23,6 @@ app.include_router(
 @app.get("/")
 async def root():
   return {"message":"Hello bigger apps"}
+
+
+
