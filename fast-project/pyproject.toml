@@ -8,7 +8,7 @@ dependencies = [
     "sqlmodel>=0.0.50",
 ]
 [tool.fastapi]
-entrypoint = "Relational_dbs:app"
+entrypoint = "app.main:app"
 requires-python = ">=3.12"
 dependencies = [
 
