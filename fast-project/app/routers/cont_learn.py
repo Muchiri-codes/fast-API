@@ -1,6 +1,6 @@
 from collections.abc import AsyncIterable, Iterable
-
-from fastapi import APIRouter
+from typing import Annotated
+from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel
 
@@ -60,3 +60,26 @@ async def stream_chat(prompt: Prompt) -> AsyncIterable[ServerSentEvent]:
   for word in words:
     yield ServerSentEvent(data = word, event="token")
   yield ServerSentEvent(raw_data='[DONE]', event="done")
+  
+  
+#BACKGROUND TASKS
+
+def write_log(message:str):
+  with open("log.txt", mode="a") as log:
+    log.write(message)
+
+def get_query(background_tasks:BackgroundTasks, q:str| None = None):
+  if q:
+    message =f"found query: {q}\n"
+    background_tasks.add_task(write_log, message)
+  return q 
+
+@router.post("/notifications/{email}", tags=["notifications"])
+async def send_notification(
+  email:str,
+  background_tasks:BackgroundTasks, 
+  q:Annotated[str, Depends(get_query)] #call get_query and use its return value
+):
+  message=f"message to {email}\n"
+  background_tasks.add_task(write_log, message)
+  return {"message":"Message sent"}
