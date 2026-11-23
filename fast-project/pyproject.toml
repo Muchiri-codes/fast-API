@@ -3,8 +3,10 @@ name = "fast-project"
 version = "0.1.0"
 dependencies = [
     "email-validator>=2.3.0",
+    "httpx>=0.28.1",
     "pwdlib[argon2]>=0.4.2",
     "pyjwt>=2.15.1",
+    "pytest>=9.2.0",
     "sqlmodel>=0.0.50",
 ]
 [tool.fastapi]
