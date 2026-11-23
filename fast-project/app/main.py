@@ -6,7 +6,7 @@ from typing import Annotated
 from .dependencies import get_token_header, get_query_token
 from .internal import admin
 from .routers import items, users, cont_learn
-from fastapi.testclient import TestClient
+import uvicorn
 
 description="""
 Jonte App helps you get rich overnight
@@ -104,6 +104,8 @@ async def create_item(stuff: Stuff, x_token: Annotated[str, Header()]) -> Stuff:
     fake_db[stuff.id] = stuff.model_dump()
     return stuff
   
-
+if __name__ == "__main_":
+  uvicorn.run(app, host="0.0.0.0", port=8000)
+  
 
 
