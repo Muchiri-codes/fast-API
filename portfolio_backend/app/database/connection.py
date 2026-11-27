@@ -7,7 +7,7 @@ from app.core.config import settings
 
 # Create the database engine
 engine = create_engine(
-    settings.DATABASE_URL,
+    settings.DATABASE_URL, #major
     pool_pre_ping=True,
     pool_size=5,
     max_overflow=10,
@@ -15,18 +15,14 @@ engine = create_engine(
 )
 
 
-# Create database sessions
 SessionLocal = sessionmaker(
-    bind=engine,
-    autocommit=False,
-    autoflush=False
+    bind = engine,
+    autoflush=False,
+    autocommit=False
 )
 
-
-# Base class for database models
 class Base(DeclarativeBase):
     pass
-
 
 # Dependency for FastAPI routes
 def get_db():

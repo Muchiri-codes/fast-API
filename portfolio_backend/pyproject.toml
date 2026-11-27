@@ -1,0 +1,16 @@
+
+[project]
+name = "portfolio-backend"
+version = "0.1.0"
+description = "Backend mini app for a portfolio"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]",
+    "sqlalchemy",
+    "psycopg[binary]",
+    "pydantic-settings",
+    "alembic",
+]
+
+[tool.fastapi]
+entrypoint = "app.main:app"
