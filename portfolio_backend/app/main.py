@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-from app.models.user import User
-from app.database.connection import engine
+from app.database.connection import engine, Base
 
-User.metadata.create_all(bind = engine) # create the tables
+Base.metadata.create_all(bind = engine) # create the tables
 app = FastAPI()
 
 @app.get("/")
